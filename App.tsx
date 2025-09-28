@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
@@ -15,12 +15,23 @@ import { enableScreens } from 'react-native-screens';
 import MarketList from './view/home/index';
 import PairDetail from './view/detail/index';
 
-enableScreens();
+// 👉 import AdMob
+import mobileAds from 'react-native-google-mobile-ads';
 
+enableScreens();
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
+
+  useEffect(() => {
+    // Inisialisasi AdMob saat app mulai
+    mobileAds()
+      .initialize()
+      .then(() => {
+        console.log('AdMob initialized ✅');
+      });
+  }, []);
 
   return (
     <SafeAreaProvider>
@@ -46,13 +57,13 @@ const AppContent = () => {
             name="PairDetail"
             component={PairDetail}
             options={{
-              headerTransparent: false, // header transparan
-              headerTitle: '',         // hapus title bawaan
-              headerShadowVisible: false, // hilangkan shadow default (iOS)
+              headerTransparent: false,
+              headerTitle: '',
+              headerShadowVisible: false,
               headerStyle: {
                 backgroundColor: 'transparent',
               },
-              headerTintColor: '#f3ba2f', // warna icon back
+              headerTintColor: '#f3ba2f',
             }}
           />
         </Stack.Navigator>

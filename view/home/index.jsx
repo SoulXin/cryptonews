@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  Image, 
-  StyleSheet, 
-  TextInput, 
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  StyleSheet,
+  TextInput,
   TouchableOpacity,
-  Dimensions 
+  Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 const { width } = Dimensions.get('window');
 
@@ -20,6 +22,7 @@ const MarketList = () => {
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // Fetch data coins dari CoinGecko
   const fetchCoins = async () => {
     try {
       const res = await fetch(
@@ -39,15 +42,18 @@ const MarketList = () => {
     fetchCoins();
   }, []);
 
+  // Filter search
   const handleSearch = (text) => {
     setSearchText(text);
-    const filtered = coins.filter((coin) =>
-      coin.symbol.toLowerCase().includes(text.toLowerCase()) ||
-      coin.name.toLowerCase().includes(text.toLowerCase())
+    const filtered = coins.filter(
+      (coin) =>
+        coin.symbol.toLowerCase().includes(text.toLowerCase()) ||
+        coin.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredCoins(filtered);
   };
 
+  // Render tiap item coin
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.item}
@@ -60,11 +66,16 @@ const MarketList = () => {
   );
 
   if (loading) {
-    return <Text style={{ color: '#f3ba2f', textAlign: 'center', marginTop: 20 }}>Loading...</Text>;
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: '#f3ba2f', fontSize: 16 }}>Loading...</Text>
+      </View>
+    );
   }
 
   return (
-    <View style={styles.container}>
+    // SafeAreaView untuk menyesuaikan notch / status bar
+    <SafeAreaView style={styles.container}>
       {/* Search Bar */}
       <TextInput
         style={styles.searchInput}
@@ -74,15 +85,25 @@ const MarketList = () => {
         onChangeText={handleSearch}
       />
 
-      {/* Grid List */}
+      {/* FlatList dengan flex:1 supaya banner tetap di bawah */}
       <FlatList
         data={filteredCoins}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={{ paddingBottom: 16 }}
+        style={{ flex: 1 }}
       />
-    </View>
+
+      {/* Banner Ad di bawah */}
+      <View style={{ alignItems: 'center', marginTop: 4 }}>
+        <BannerAd
+          unitId="ca-app-pub-6421233417984358/8028981170" // Test ID AdMob
+          size={BannerAdSize.BANNER}
+          requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -92,7 +113,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
-    padding: 8,
+    paddingHorizontal: 8,
   },
   searchInput: {
     backgroundColor: '#1a1a1a',
@@ -100,7 +121,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    marginBottom: 12,
+    marginVertical: 12,
     borderWidth: 1,
     borderColor: '#f3ba2f',
   },

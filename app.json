@@ -1,4 +1,7 @@
 {
   "name": "CryptoNews",
-  "displayName": "CryptoNews"
+  "displayName": "CryptoNews",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-6421233417984358~6239873896"
+  }
 }
